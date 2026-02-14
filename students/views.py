@@ -10,4 +10,4 @@ def students(request):
          'age':18,
          }
     ]
-    return HttpResponse('<h2>Hello World</h2>')
+    return HttpResponse(students)
