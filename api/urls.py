@@ -7,4 +7,5 @@ urlpatterns = [
 
     #class based view
     path('employees/', views.Employees.as_view()),
+    path('employees/<int:id>/', views.EmployeeDetail.as_view()),
 ]

@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from rest_framework import status
 
 from employees.models import Employee
@@ -65,3 +65,28 @@ class Employees(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class EmployeeDetail(APIView):
+    def get_object(self, id):
+        try:
+            return Employee.objects.get(pk=id)
+        except Employee.DoesNotExist:
+            raise Http404
+
+    def get(self, request, id):
+        employee = self.get_object(id)
+        serializer = EmployeeSerializer(employee)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, id):
+        employee = self.get_object(id)
+        serializer = EmployeeSerializer(employee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        employee = self.get_object(id)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
