@@ -1,11 +1,14 @@
 from django.http import JsonResponse
 from rest_framework import status
 
+from employees.models import Employee
 from students.models import Student
-from .serializers import StudentSerializer
+from .serializers import StudentSerializer, EmployeeSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from employees.models import Employee
 
 #decorator
 @api_view(['GET', 'POST'])
@@ -50,3 +53,15 @@ def studentDetailView(request, id):
     if request.method == 'DELETE':
         student.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class Employees(APIView):
+    def get(self, request):
+        employees = Employee.objects.all()
+        serializer = EmployeeSerializer(employees, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = EmployeeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
